@@ -80,6 +80,9 @@
 
 ;;; Show character before or after keying
 (define SHOW_CHAR (config 'SHOW_CHAR 'after))
+
+;;; New letters is prefered for random generation
+(define KOCH_NEW_CHAR_PREF (config 'KOCH_NEW_CHAR_PREF #f))
 ;;; -----------------------------------------------
 
 ;;; Calculated constants
@@ -250,11 +253,16 @@
     (#\@ ". - - . - .")))
 
 ;;; Generate random text
-(define (gen-random-text abet alen len minl maxl)
+(define (gen-random-text abet alen len minl maxl [new-pref #f])
   (let loop ((text '()))
     (if (>= (length text) len) (list->string text)
         (loop (append text (build-list (random minl (+ maxl 1))
-                                       (lambda (x) (string-ref abet (random alen))))
+                                       (if new-pref
+                                           (lambda (x) (string-ref
+                                                   abet
+                                                   (let ((r (random)))
+                                                     (inexact->exact (truncate (* alen (sqrt r)))))))
+                                           (lambda (x) (string-ref abet (random alen)))))
                       '(#\space))))))
 
 ;;; Print diff
@@ -400,8 +408,8 @@
                     (printf "  listen [string]   Only listen [string] or random sequence\n\n")
                     (error "Unknown argument" (car cmds))))))))
     (cond
-     ((eq? mode 'receive) (train-receive (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL)))
-     ((eq? mode 'listen) (train-listen (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL)))
+     ((eq? mode 'receive) (train-receive (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
+     ((eq? mode 'listen) (train-listen (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
      ((string? mode) (train-listen mode)))))
 
 (main)
