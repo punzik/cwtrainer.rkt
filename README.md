@@ -1,30 +1,33 @@
 # CW (Morse code) Trainer. Koch method
 
-Программа предназначена для помощи в изучении азбуки Морзе методом Коха.
+*Read this in other languages: [English](README.md), [Русский](README.ru.md).*
 
-Описание писать лень (может быть позже), если кому-то будет интересно,
-просто запустите и попробуйте.
+This program is designed to help in learning Morse code by use the
+Koch method.
 
-## Требования
+I'll write description maybe later, but if someone is interested, just
+run it and try it.
+
+## Requirements
 
 * Linux
 * Racket
 * PulseAudio
 
-## Запуск
+## Launching
 
-Программа консольная, по этому запускается из терминала:
+This is console program and must be run from terminal:
 
     $ racket ./cwtrainer.rkt
 
-Если хочется просто послушать текст или случайный набор букв, то:
+If you want just listen a random set os letters or a text then run:
 
     $ racket ./cwtrainer.rkt listen
 
-или
+or
 
     $ racket ./cwtrainer.rkt listen "Privet ot staryh stiblet"
 
-## Настройки
+## Settings
 
-Конфигурационные настройки программы хранятся в файле `cwtrainer.conf`.
+The configuration settings are stored in the cwtrainer.conf.
