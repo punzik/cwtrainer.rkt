@@ -182,7 +182,7 @@
                    (before-play-char #\space)
                    (word-space)
                    (after-play-char #\space))
-                 (let ((morse (assoc char abet (lambda (a b) (member a b char-ci=?)))))
+                 (let ((morse (assoc char abet (curryr member char-ci=?))))
                    (when (not (null? morse))
                      (before-play-char char)
                      (play-cw-seq (cadr morse))
