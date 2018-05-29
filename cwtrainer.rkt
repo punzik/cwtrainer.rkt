@@ -67,7 +67,10 @@
 (define KOCH_CHARS (config 'KOCH_CHARS "kmrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x"))
 
 ;;; Current Koch step
-(define KOCH_STEP (config 'KOCH_STEP (string-length KOCH_CHARS)))
+(define KOCH_STEP
+  (let* ((len (string-length KOCH_CHARS))
+         (step (config 'KOCH_STEP len)))
+    (if (> step len) len step)))
 
 ;;; Length of the lesson (letters incluse spaces)
 (define KOCH_LENGTH (config 'KOCH_LENGTH 200))
@@ -330,7 +333,8 @@
                                     (make-cw-space WORD_SPACE_SEC)
                                     (make-cw-seq-player dit dah (make-cw-space DIT_LEN_SEC)))))
 
-    (printf "\nBe ready to input text (~a symbols)... " (string-length text))
+    (printf "\nCurrent alphabet: ~a\n" (substring KOCH_CHARS 0 KOCH_STEP))
+    (printf "Be ready to input text (~a symbols)... " (string-length text))
     (for-each (lambda (n)
                 (display n)
                 (flush-output)
@@ -380,7 +384,8 @@
                                     #:before (if (eq? SHOW_CHAR 'before) show-char not)
                                     #:after (if (eq? SHOW_CHAR 'after) show-char not))))
 
-    (printf "\nBe ready to listen text (~a symbols)... " (string-length text))
+    (printf "\nCurrent alphabet: ~a\n" (substring KOCH_CHARS 0 KOCH_STEP))
+    (printf "Be ready to listen text (~a symbols)... " (string-length text))
     (for-each (lambda (n)
                 (display n)
                 (flush-output)
