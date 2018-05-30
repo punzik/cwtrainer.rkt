@@ -322,6 +322,10 @@
                            (~% (cadddr x))))
             (cdr stat)))
 
+;;; Delete spaces from list
+(define (trim-spaces lst)
+  (filter (lambda (x) (not (eq? x #\space))) lst))
+
 ;;; ----------------------------- TRAINING ---------------------------
 ;;; Receive training
 (define (train-receive text)
@@ -355,10 +359,12 @@
                                                     'skip)
                                              #t)
                                          #f)))))
-                   (diff (string->list text) (string->list intext) char-ci=?))
+                   (diff (trim-spaces (string->list text))
+                         (trim-spaces (string->list intext))
+                         char-ci=?))
                (thread-wait thrd)))))
       (let ((stat
-             (let ((stat (diff-stat diff char-ci=? (lambda (x) (or (not x) (equal? x #\space))))))
+             (let ((stat (diff-stat diff char-ci=?)))
                (cons (car stat)
                      (sort (cdr stat)
                            (lambda (a b) (char-ci<? (car a) (car b))))))))
@@ -418,7 +424,9 @@
                     (printf "  listen [string]   Only listen [string] or random sequence\n\n")
                     (error "Unknown argument" (car cmds))))))))
     (cond
-     ((eq? mode 'receive) (train-receive (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
+     ((eq? mode 'receive) (train-receive "oaosl u rot p lotr to lrmp uo kul o psa op ltr uolsr"
+                           ;(gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)
+                           ))
      ((eq? mode 'listen) (train-listen (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
      ((string? mode) (train-listen mode)))))
 
