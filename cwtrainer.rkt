@@ -424,9 +424,7 @@
                     (printf "  listen [string]   Only listen [string] or random sequence\n\n")
                     (error "Unknown argument" (car cmds))))))))
     (cond
-     ((eq? mode 'receive) (train-receive "oaosl u rot p lotr to lrmp uo kul o psa op ltr uolsr"
-                           ;(gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)
-                           ))
+     ((eq? mode 'receive) (train-receive (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
      ((eq? mode 'listen) (train-listen (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
      ((string? mode) (train-listen mode)))))
 
