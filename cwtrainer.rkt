@@ -428,4 +428,5 @@
      ((eq? mode 'listen) (train-listen (gen-random-text KOCH_CHARS KOCH_STEP KOCH_LENGTH KOCH_MINL KOCH_MAXL KOCH_NEW_CHAR_PREF)))
      ((string? mode) (train-listen mode)))))
 
-(main)
+(with-handlers ((exn:break? (lambda (exn) (printf "\nUser break. Exiting\n"))))
+  (main))
