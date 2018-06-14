@@ -86,6 +86,11 @@
 
 ;;; New letters is prefered for random generation
 (define KOCH_NEW_CHAR_PREF (config 'KOCH_NEW_CHAR_PREF #f))
+
+;;; Repeat each char n times
+(define REPEAT_CHAR
+  (let ((rc (config 'REPEAT_CHAR 1)))
+    (if (< rc 1) 1 rc)))
 ;;; -----------------------------------------------
 
 ;;; Calculated constants
@@ -335,7 +340,10 @@
          (play (make-cw-text-player morse-alphabet
                                     (make-cw-space CHAR_SPACE_SEC)
                                     (make-cw-space WORD_SPACE_SEC)
-                                    (make-cw-seq-player dit dah (make-cw-space DIT_LEN_SEC)))))
+                                    (make-cw-seq-player dit dah (make-cw-space DIT_LEN_SEC))))
+         (text-to-play (string-normalize-spaces
+                        (for/fold ((s "")) ((c (in-string text)))
+                          (string-append s (make-string REPEAT_CHAR c))))))
 
     (printf "\nCurrent alphabet: ~a\n" (substring KOCH_CHARS 0 KOCH_STEP))
     (printf "Be ready to input text (~a symbols)... " (string-length text))
@@ -349,7 +357,7 @@
     (sleep 0.5)
 
     (let ((diff
-           (let ((thrd (thread (lambda () (play text)))))
+           (let ((thrd (thread (lambda () (play text-to-play)))))
              (begin0
                  (let ((intext
                         (read-line (lambda (ch)
