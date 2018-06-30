@@ -54,6 +54,9 @@
 ;;; CW character speed in WPM
 (define CHAR_SPEED (config 'CHAR_SPEED 25))
 
+;;; CW word speed in WPM
+(define WORD_SPEED (config 'WORD_SPEED CHAR_SPEED))
+
 ;;; CW characer space in dits (default 3)
 (define CHAR_SPACE (config 'CHAR_SPACE 3))
 
@@ -95,8 +98,9 @@
 
 ;;; Calculated constants
 (define DIT_LEN_SEC (/ 1.2 CHAR_SPEED))
-(define CHAR_SPACE_SEC (* CHAR_SPACE DIT_LEN_SEC))
-(define WORD_SPACE_SEC (* WORD_SPACE DIT_LEN_SEC))
+(define SPACE_DIT_LEN_SEC (/ 1.2 WORD_SPEED))
+(define CHAR_SPACE_SEC (* CHAR_SPACE SPACE_DIT_LEN_SEC))
+(define WORD_SPACE_SEC (* WORD_SPACE SPACE_DIT_LEN_SEC))
 (define FADING_SEC (* DIT_LEN_SEC (/ FADING 100)))
 
 ;;; Number to exact integer
