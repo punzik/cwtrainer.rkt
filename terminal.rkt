@@ -26,6 +26,9 @@
  ;; Read line
  read-line
 
+ ;; Parameter. If #t (c) return color, "" otherwise
+ colorize
+
  ;; Return escape sequence for color
  c
 
@@ -268,7 +271,11 @@
     (bg-cyan            ,(esc "[46m"))
     (bg-gray            ,(esc "[47m"))))
 
+(define colorize (make-parameter #t))
+
 ;;; Return escape sequence for color
 (define (c clr)
-  (let ((x (assoc clr ansi-colors)))
-    (if x (cadr x) (error "No color" clr))))
+  (if (colorize)
+      (let ((x (assoc clr ansi-colors)))
+        (if x (cadr x) (error "No color" clr)))
+      ""))

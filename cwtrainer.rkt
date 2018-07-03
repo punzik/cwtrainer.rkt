@@ -19,10 +19,11 @@
 
 #lang racket
 
-(require rnrs/io/ports-6)
-(require "audio.rkt")
-(require "terminal.rkt")
-(require "list-diff.rkt")
+(require rnrs/io/ports-6
+         racket/date)
+(require "audio.rkt"
+         "terminal.rkt"
+         "list-diff.rkt")
 
 ;;; -------- READ CONFIGURATION PARAMETERS --------
 (define CONFIG_FILE "cwtrainer.conf")
@@ -94,6 +95,10 @@
 (define REPEAT_CHAR
   (let ((rc (config 'REPEAT_CHAR 1)))
     (if (< rc 1) 1 rc)))
+
+;;; Write results and stats to this file
+(define RESULT_FILE (config 'RESULT_FILE #f))
+
 ;;; -----------------------------------------------
 
 ;;; Calculated constants
@@ -340,6 +345,21 @@
                            (~% (cadddr x))))
             (cdr stat)))
 
+;;; Print result of receive text
+(define (print-result sent received)
+  (let ((df (diff (trim-spaces (string->list sent))
+                  (trim-spaces (string->list received))
+                  char-ci=?)))
+    (let ((stat
+           (let ((stat (diff-stat df char-ci=?)))
+             (cons (car stat)
+                   (sort (cdr stat)
+                         (lambda (a b) (char-ci<? (car a) (car b))))))))
+      (print-diff df)
+      (newline)
+      (print-stat stat)
+      (newline))))
+
 ;;; Delete spaces from list
 (define (trim-spaces lst)
   (filter (lambda (x) (not (eq? x #\space))) lst))
@@ -369,31 +389,34 @@
     (printf "Go!\n>> ")
     (sleep 0.5)
 
-    (let ((diff
-           (let ((thrd (thread (lambda () (play text-to-play)))))
+    (let ((thrd (thread (lambda () (play text-to-play)))))
+      (let ((intext
              (begin0
-                 (let ((intext
-                        (read-line (lambda (ch)
-                                     (if (equal? ch 'cr)
-                                         (if (thread-running? thrd)
-                                             (begin (thread-send thrd 'toggle)
-                                                    'skip)
-                                             #t)
-                                         #f)))))
-                   (diff (trim-spaces (string->list text))
-                         (trim-spaces (string->list intext))
-                         char-ci=?))
-               (thread-wait thrd)))))
-      (let ((stat
-             (let ((stat (diff-stat diff char-ci=?)))
-               (cons (car stat)
-                     (sort (cdr stat)
-                           (lambda (a b) (char-ci<? (car a) (car b))))))))
+                 (read-line (lambda (ch)
+                              (if (equal? ch 'cr)
+                                  (if (thread-running? thrd)
+                                      (begin (thread-send thrd 'toggle)
+                                             'skip)
+                                      #t)
+                                  #f)))
+               (thread-wait thrd))))
         (printf "\nResult:\n")
-        (print-diff diff)
-        (printf "\nStatistics:\n")
-        (print-stat stat)
-        (newline)))
+        (print-result text intext)
+
+        (when RESULT_FILE
+          (with-output-to-file
+              RESULT_FILE #:exists 'append
+              (lambda ()
+                (date-display-format 'rfc2822)
+                (parameterize ((colorize #f))
+                  (printf "--------------- ~a\n" (date->string (current-date) #t))
+                  (printf "Char speed: ~a WPM\n" CHAR_SPEED)
+                  (printf "Word speed: ~a WPM\n" WORD_SPEED)
+                  (printf "Dah len/char space/word space: ~a/~a/~a\n" DAH_LENGTH CHAR_SPACE WORD_SPACE)
+                  (printf "Alphabet: ~a\n" (substring KOCH_CHARS 0 KOCH_STEP))
+                  (newline)
+                  (print-result text intext)))))))
+
     (pb 'free)))
 
 ;;; Just listening
